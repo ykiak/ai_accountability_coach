@@ -3,11 +3,13 @@ import { useRouter } from "next/navigation"
 import { useState, useEffect } from "react"
 import { supabase } from "@/lib/supabaseClient"
 import LogoutButton from "@/components/LogoutButton"
+import Link from "next/link"
 
 export default function Dashboard() {
   const [user, setUser] = useState<string | null>(null)
+  const [userId, setUserId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [conversation, setConversation] = useState<{role: string, content: string}[]>([])
+  const [conversation, setConversation] = useState<{ role: string, content: string }[]>([])
   const [obj, setObj] = useState('')
   const [msg, setMsg] = useState('')
   const router = useRouter()
@@ -31,6 +33,7 @@ export default function Dashboard() {
         "User"
 
       setUser(identifier)
+      setUserId(session.user.id)
       setLoading(false)
     }
 
@@ -46,6 +49,7 @@ export default function Dashboard() {
             session.user.user_metadata?.email ||
             "User"
           setUser(identifier)
+          setUserId(session.user.id)
         }
       }
     )
@@ -76,7 +80,8 @@ export default function Dashboard() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          messages: updatedConversation
+          messages: updatedConversation,
+          user_id: userId
         }),
       })
 
@@ -97,10 +102,12 @@ export default function Dashboard() {
       <div>
         <h1>Welcome, {user}</h1>
         <LogoutButton />
+        <br></br>
+        <Link href={'/habits'}>Click here</Link>
       </div>
 
       <div>
-        <div style={{whiteSpace: 'pre-wrap'}}>
+        <div style={{ whiteSpace: 'pre-wrap' }}>
           {conversation.map((c, i) => (
             <p key={i}><b>{c.role}:</b> {c.content}</p>
           ))}
