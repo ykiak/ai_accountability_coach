@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from "react";
+import { useState, useEffect} from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "../lib/supabaseClient";
 import Link from "next/link";
@@ -10,6 +10,28 @@ export default function Login(){
   const [password, setPassword] = useState('')
   const [msg, setMsg] = useState('')
   const router = useRouter()
+
+  useEffect(()=>{
+    const checkIfLoggedIn = async ()=> {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.replace('/dashboard')
+         }
+    } 
+    checkIfLoggedIn()
+
+    const {
+      data: { subscription }
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session) {
+        router.replace('/dashboard')
+      }
+    })
+
+    return () => {
+      subscription.unsubscribe()
+    }
+  }, [router])
 
   const handleLogin = async (e:React.FormEvent<HTMLFormElement>)=>{
     e.preventDefault()
