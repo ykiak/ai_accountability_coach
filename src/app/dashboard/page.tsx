@@ -7,10 +7,10 @@ import LogoutButton from "@/components/LogoutButton"
 export default function Dashboard() {
   const [user, setUser] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
-  const [res, setRes] = useState('')
+  const [conversation, setConversation] = useState<{role: string, content: string}[]>([])
   const [obj, setObj] = useState('')
   const [msg, setMsg] = useState('')
-  const router = useState('')
+  const router = useRouter()
 
   useEffect(() => {
     let mounted = true
@@ -25,10 +25,9 @@ export default function Dashboard() {
         return
       }
 
-      const currentUser = session.user
       const identifier =
-        currentUser.email ||
-        currentUser.user_metadata?.email ||
+        session.user.email ||
+        session.user.user_metadata?.email ||
         "User"
 
       setUser(identifier)
@@ -58,66 +57,65 @@ export default function Dashboard() {
   }, [router])
 
   const input = async () => {
-    if(!obj){
+    if (!obj) {
       setMsg('Write something first')
       return
     }
-    setMsg('Thinking')
-    setRes('')
 
-    const prompt = `Help the user with this: "${obj}"`
+    setMsg('Thinking...')
 
-    try{
+    const updatedConversation = [
+      ...conversation,
+      { role: "user", content: obj }
+    ]
+    setConversation(updatedConversation)
+    setObj('')
+
+    try {
       const resp = await fetch('/api/chat', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({prompt}),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          messages: updatedConversation
+        }),
       })
+
       const result = await resp.json()
+      const reply = result?.choices?.[0]?.message?.content || 'Error'
 
-      if(result?.choices?.[0]?.message?.content){
-        setRes(result.choices[0].message.content)
-        setMsg('')
-        setObj('')
-      }else{
-        setMsg('Error 1')
-      }
-      }catch(err){
-        setMsg('Error 2')
+      setConversation(prev => [...prev, { role: "assistant", content: reply }])
+      setMsg('')
+    } catch (err) {
+      setMsg('Error')
     }
-  }
-
-  const newChat = () => {
-    setRes('')
-    setMsg('')
-    setObj('')
   }
 
   if (loading) return <p>Loading...</p>
 
   return (
     <main>
-    <div>
-      <h1>Welcome, {user}</h1>
-      <LogoutButton />
-    </div>
-    <div>
+      <div>
+        <h1>Welcome, {user}</h1>
+        <LogoutButton />
+      </div>
+
+      <div>
+        <div style={{whiteSpace: 'pre-wrap'}}>
+          {conversation.map((c, i) => (
+            <p key={i}><b>{c.role}:</b> {c.content}</p>
+          ))}
+        </div>
+
         <input
-        type="text"
-        placeholder="How can I help you?"
-        value={obj}
-        onChange={(e) => setObj(e.target.value)}
+          type="text"
+          placeholder="How can I help you?"
+          value={obj}
+          onChange={(e) => setObj(e.target.value)}
         />
-        <button onClick={input}>Generate</button>
+        <button onClick={input}>Send</button>
 
         {msg && <p>{msg}</p>}
-        {res && (
-          <div>
-            <pre>{res}</pre>
-            <button onClick={newChat}>Try again</button>
-          </div>
-        )}
-    </div>
+      </div>
     </main>
   )
 }
