@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect} from 'react'
 import { supabase } from '@/lib/supabaseClient'
+import Link from 'next/link'
 
 export default function HabitsPage() {
   const [habitType, setHabitType] = useState('health')
@@ -82,7 +83,7 @@ export default function HabitsPage() {
           {loading ? 'Saving...' : 'Save Habit'}
         </button>
       </form>
-
+        <Link href={'/dashboard'}>Click here to return</Link>
       {message && <p className="mt-4">{message}</p>}
     </div>
   )

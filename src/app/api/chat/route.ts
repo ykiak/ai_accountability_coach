@@ -19,25 +19,44 @@ export async function POST(req: NextRequest) {
       )
     }
 
+    const { data: profile, error: profileError } = await supabase
+      .from('user_profiles')
+      .select('name, birth_date, height_cm, weight_kg, bio')
+      .eq('user_id', user_id)
+      .single()
+
+    if (profileError) {
+      console.error('Error fetching profile:', profileError)
+    }
+
     const { data: habits, error: habitsError } = await supabase
       .from('user_habits')
       .select('*')
       .eq('user_id', user_id)
 
     if (habitsError) {
-      console.error('Erro ao buscar hábitos:', habitsError)
+      console.error('Error fetching habits:', habitsError)
     }
 
     const habitsText =
       habits && habits.length > 0
         ? habits.map(h => `${h.habit_type}: ${h.description}`).join('; ')
-        : 'Nenhum hábito registrado ainda.'
+        : 'No habits registered yet.'
+
+    const profileText = profile
+      ? `Name: ${profile.name || 'Not provided'}.
+         Birth date: ${profile.birth_date || 'Not provided'}.
+         Height: ${profile.height_cm ? profile.height_cm + ' cm' : 'Not provided'}.
+         Weight: ${profile.weight_kg ? profile.weight_kg + ' kg' : 'Not provided'}.
+         Bio: ${profile.bio || 'Not provided'}.`
+      : 'No profile information available.'
 
     const systemMessage = {
       role: 'system',
-      content: `Você é um coach que ajuda pessoas a manter hábitos saudáveis.
-      Hábitos conhecidos: ${habitsText}.
-      Sempre personalize suas respostas levando em conta esses hábitos.`
+      content: `You are a personal health and habits coach.
+      User profile: ${profileText}
+      Known habits: ${habitsText}
+      Always personalize your responses considering this information.`
     }
 
     const response = await fetch(

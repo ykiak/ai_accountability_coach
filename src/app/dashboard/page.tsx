@@ -15,6 +15,23 @@ export default function Dashboard() {
   const router = useRouter()
 
   useEffect(() => {
+    const saved = localStorage.getItem("conversation");
+    if (saved) {
+      try {
+        setConversation(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem("conversation");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (conversation.length > 0) {
+      localStorage.setItem("conversation", JSON.stringify(conversation));
+    }
+  }, [conversation]);
+
+  useEffect(() => {
     let mounted = true
 
     const checkSession = async () => {
@@ -95,6 +112,12 @@ export default function Dashboard() {
     }
   }
 
+  const clearConversation = () =>{
+    setConversation([])
+    localStorage.removeItem('conversation')
+    setMsg('Conversation cleared')
+  }
+
   if (loading) return <p>Loading...</p>
 
   return (
@@ -103,7 +126,9 @@ export default function Dashboard() {
         <h1>Welcome, {user}</h1>
         <LogoutButton />
         <br></br>
-        <Link href={'/habits'}>Click here</Link>
+        <Link href={'/habits'}>Set goals</Link>
+        <br></br>
+        <Link href={'/profile'}>Profile</Link>
       </div>
 
       <div>
@@ -120,6 +145,8 @@ export default function Dashboard() {
           onChange={(e) => setObj(e.target.value)}
         />
         <button onClick={input}>Send</button>
+        <br></br>
+        <button onClick={clearConversation}>Clear chat</button>
 
         {msg && <p>{msg}</p>}
       </div>
