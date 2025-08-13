@@ -76,66 +76,73 @@ export default function ProfilePage() {
   }
 
   if (loading) {
-    return <p>Loading...</p>
+    return <p className="text-center mt-20 text-blue-700 font-semibold">Loading...</p>
   }
 
   return (
-    <div>
-      <h1>My Profile</h1>
-      <form onSubmit={handleSave}>
-        <div>
+    <main className="min-h-screen bg-gradient-to-b from-[#3432c7] to-[#000000] p-6 font-sans flex justify-center">
+      <section className="bg-white rounded-lg shadow p-8 w-full max-w-lg mx-4">
+        <h1 className="text-3xl font-extrabold text-blue-800 mb-8 text-center">My Profile</h1>
+
+        <form onSubmit={handleSave} className="flex flex-col gap-6">
           <input
             type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
             placeholder="Full name"
+            required
+            className="w-full px-4 py-3 border border-gray-400 rounded shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
           />
-        </div>
 
-        <div>
           <input
             type="date"
             value={birthDate}
             onChange={(e) => setBirthDate(e.target.value)}
+            className="w-full px-4 py-3 border border-gray-400 rounded shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
           />
-        </div>
 
-        <div>
           <input
             type="number"
             value={heightCm}
             onChange={(e) => setHeightCm(e.target.value)}
             placeholder="Height (cm)"
+            className="w-full px-4 py-3 border border-gray-400 rounded shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
           />
-        </div>
 
-        <div>
           <input
             type="number"
             value={weightKg}
             onChange={(e) => setWeightKg(e.target.value)}
             placeholder="Weight (kg)"
             step="0.1"
+            className="w-full px-4 py-3 border border-gray-400 rounded shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-600 transition"
           />
-        </div>
 
-        <div>
           <textarea
             value={bio}
             onChange={(e) => setBio(e.target.value)}
             placeholder="Tell me a bit about yourself."
+            rows={4}
+            className="w-full px-4 py-3 border border-gray-400 rounded shadow-sm text-black focus:outline-none focus:ring-2 focus:ring-blue-600 transition resize-none"
           />
-        </div>
 
-        <button
-          type="submit"
-          disabled={saving}
-        >
-          {saving ? 'Saving...' : 'Save changes'}
-        </button>
-      </form>
-      <Link href={'/dashboard'}>Return</Link>
-      {message && <p>{message}</p>}
-    </div>
+          <button
+            type="submit"
+            disabled={saving}
+            className="w-full bg-blue-700 hover:bg-blue-800 text-white py-3 rounded font-semibold transition disabled:opacity-50"
+          >
+            {saving ? 'Saving...' : 'Save changes'}
+          </button>
+        </form>
+
+        <p className="mt-8 text-center text-blue-700 font-semibold hover:underline">
+          <Link href="/dashboard">Return</Link>
+        </p>
+
+        {message && (
+          <p className="mt-6 text-center text-sm text-red-600 font-medium">{message}</p>
+        )}
+      </section>
+    </main>
   )
 }

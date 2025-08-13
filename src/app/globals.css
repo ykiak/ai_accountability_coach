@@ -24,3 +24,31 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+@keyframes draw {
+  0% {
+    stroke-dashoffset: 1000;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 4px #60a5fa);
+  }
+  50% {
+    filter: drop-shadow(0 0 10px #60a5fa);
+  }
+}
+
+.animate-moon {
+  animation: draw 2s ease forwards;
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
